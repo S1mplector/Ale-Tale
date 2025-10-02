@@ -184,6 +184,21 @@ export function EntryDetailPage() {
         </div>
 
         <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+          <Link
+            to={`/entry/${entry.id}/edit`}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#3498db',
+              color: 'white',
+              border: 'none',
+              borderRadius: 4,
+              fontSize: '1rem',
+              fontWeight: 500,
+              textDecoration: 'none',
+            }}
+          >
+            Edit Entry
+          </Link>
           <button
             onClick={handleDelete}
             style={{

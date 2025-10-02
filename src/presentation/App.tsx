@@ -4,6 +4,7 @@ import { HomePage } from '@presentation/pages/HomePage';
 import { AddEntryPage } from '@presentation/pages/AddEntryPage';
 import { EntryDetailPage } from '@presentation/pages/EntryDetailPage';
 import { Layout } from '@presentation/components/Layout';
+import { EditEntryPage } from '@presentation/pages/EditEntryPage';
 
 export function App() {
   return (
@@ -13,6 +14,7 @@ export function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/add" element={<AddEntryPage />} />
           <Route path="/entry/:id" element={<EntryDetailPage />} />
+          <Route path="/entry/:id/edit" element={<EditEntryPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

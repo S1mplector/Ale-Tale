@@ -5,6 +5,7 @@ import { CreateJournalEntryUseCase } from '@application/usecases/CreateJournalEn
 import { ListJournalEntriesUseCase } from '@application/usecases/ListJournalEntriesUseCase';
 import { GetJournalEntryUseCase } from '@application/usecases/GetJournalEntryUseCase';
 import { DeleteJournalEntryUseCase } from '@application/usecases/DeleteJournalEntryUseCase';
+import { UpdateJournalEntryUseCase } from '@application/usecases/UpdateJournalEntryUseCase';
 
 // Repositories
 const beerRepository = new LocalStorageBeerRepository();
@@ -16,3 +17,4 @@ export const createJournalEntryUseCase = new CreateJournalEntryUseCase(journalEn
 export const listJournalEntriesUseCase = new ListJournalEntriesUseCase(journalEntryRepository);
 export const getJournalEntryUseCase = new GetJournalEntryUseCase(journalEntryRepository);
 export const deleteJournalEntryUseCase = new DeleteJournalEntryUseCase(journalEntryRepository);
+export const updateJournalEntryUseCase = new UpdateJournalEntryUseCase(journalEntryRepository);
