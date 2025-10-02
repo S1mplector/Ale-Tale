@@ -6,6 +6,9 @@ import type { JournalEntry } from '@domain/entities/JournalEntry';
 export function HomePage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [minRating, setMinRating] = useState(0);
+  const [maxRating, setMaxRating] = useState(5);
 
   const loadEntries = async () => {
     setLoading(true);
@@ -46,6 +49,19 @@ export function HomePage() {
     return stars.join('');
   };
 
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = entries.filter((e) => {
+    const matchesText = normalizedQuery
+      ? (
+          e.beerName.toLowerCase().includes(normalizedQuery) ||
+          e.brewery.toLowerCase().includes(normalizedQuery) ||
+          e.style.toLowerCase().includes(normalizedQuery)
+        )
+      : true;
+    const matchesRating = e.rating >= minRating && e.rating <= maxRating;
+    return matchesText && matchesRating;
+  });
+
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
   }
@@ -77,11 +93,73 @@ export function HomePage() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#2c3e50' }}>
-        Your Journal ({entries.length} {entries.length === 1 ? 'entry' : 'entries'})
+      <h2 style={{ marginBottom: '1rem', color: '#2c3e50' }}>
+        Your Journal ({filtered.length} {filtered.length === 1 ? 'entry' : 'entries'})
       </h2>
+
+      {/* Toolbar */}
+      <div
+        style={{
+          display: 'grid',
+          gap: '0.75rem',
+          backgroundColor: 'white',
+          padding: '1rem',
+          marginBottom: '1.5rem',
+          borderRadius: 8,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}
+      >
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by beer, brewery, or style"
+            style={{
+              padding: '0.75rem',
+              fontSize: '1rem',
+              border: '1px solid #ddd',
+              borderRadius: 4,
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d' }}>
+                Min Rating: {minRating}
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={5}
+                step={0.5}
+                value={minRating}
+                onChange={(e) => setMinRating(parseFloat(e.target.value))}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d' }}>
+                Max Rating: {maxRating}
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={5}
+                step={0.5}
+                value={maxRating}
+                onChange={(e) => setMaxRating(parseFloat(e.target.value))}
+                style={{ width: '100%' }}
+              />
+            </div>
+          </div>
+          <div style={{ fontSize: '0.875rem', color: '#95a5a6' }}>
+            Showing {filtered.length} of {entries.length} entries
+          </div>
+        </div>
+      </div>
+
       <div style={{ display: 'grid', gap: '1.5rem' }}>
-        {entries.map((entry) => (
+        {filtered.map((entry) => (
           <div
             key={entry.id}
             style={{
