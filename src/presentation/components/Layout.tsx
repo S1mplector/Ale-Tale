@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { BeerGlass } from './BeerGlass';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,8 +26,20 @@ export function Layout({ children }: LayoutProps) {
             alignItems: 'center',
           }}
         >
-          <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>🍺 Brewlog</h1>
+          <Link
+            to="/"
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+            }}
+          >
+            <div style={{ transform: 'scale(0.35)', transformOrigin: 'left center' }}>
+              <BeerGlass size={55} animate={false} />
+            </div>
+            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Brewlog</h1>
           </Link>
           <Link
             to="/add"
