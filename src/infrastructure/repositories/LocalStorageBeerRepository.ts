@@ -1,7 +1,7 @@
 import { Beer } from '@domain/entities/Beer';
 import { BeerRepository } from '@domain/repositories/BeerRepository';
 
-const STORAGE_KEY = 'brewlog_beers';
+const STORAGE_KEY = 'aletale_beers';
 
 const defaultBeers: Beer[] = [
   { id: '1', name: 'Pliny the Elder', brewery: 'Russian River', style: 'Double IPA', abv: 8 },

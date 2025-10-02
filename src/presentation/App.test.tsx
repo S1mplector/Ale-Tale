@@ -4,8 +4,8 @@ import React from 'react';
 import { App } from './App';
 
 describe('App', () => {
-  it('renders Brewlog title', async () => {
+  it('renders Ale Tale title', async () => {
     render(<App />);
-    expect(screen.getByText(/Brewlog/)).toBeInTheDocument();
+    expect(screen.getByText(/Ale Tale/)).toBeInTheDocument();
   });
 });

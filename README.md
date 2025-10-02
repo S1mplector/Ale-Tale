@@ -1,4 +1,4 @@
-# Brewlog 🍺
+# Ale Tale 🍺
 
 A beer journaling and logging web app built with React + TypeScript using a clean, layered architecture.
 

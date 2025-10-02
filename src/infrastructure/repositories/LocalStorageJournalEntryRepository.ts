@@ -5,7 +5,7 @@ import {
 } from '@domain/entities/JournalEntry';
 import { JournalEntryRepository } from '@domain/repositories/JournalEntryRepository';
 
-const STORAGE_KEY = 'brewlog_journal_entries';
+const STORAGE_KEY = 'aletale_journal_entries';
 
 export class LocalStorageJournalEntryRepository implements JournalEntryRepository {
   private deserialize(data: string): JournalEntry[] {

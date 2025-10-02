@@ -9,7 +9,7 @@ interface SplashScreenProps {
 export function SplashScreen({ onDone, durationMs = 3400 }: SplashScreenProps) {
   const [phase, setPhase] = useState<'filling' | 'done'>('filling');
   const [typedText, setTypedText] = useState('');
-  const fullText = 'Brewlog';
+  const fullText = 'Ale Tale';
 
   useEffect(() => {
     // Typing animation - start after 400ms, type one char every 200ms

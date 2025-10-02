@@ -39,7 +39,7 @@ export function Layout({ children }: LayoutProps) {
             <div style={{ transform: 'scale(0.35)', transformOrigin: 'left center' }}>
               <BeerGlass size={55} animate={false} />
             </div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Brewlog</h1>
+            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Ale Tale</h1>
           </Link>
           <Link
             to="/add"
