@@ -1,15 +1,44 @@
-# Brewlog
+# Brewlog 🍺
 
 A beer journaling and logging web app built with React + TypeScript using a clean, layered architecture.
 
-## Layers
+## Features
 
-- **domain/**: Pure domain model. Entities, value objects, repository interfaces.
-- **application/**: Use cases (business logic orchestrators) depending on domain interfaces.
-- **infrastructure/**: Implementations of domain interfaces (e.g., repositories, APIs, persistence).
-- **presentation/**: React components, pages, and routing. Consumes use cases via DI.
-- **di/**: Composition root that wires concrete implementations into abstractions.
-- **shared/**: Cross-cutting helpers, types, and constants.
+- **Journal Entries**: Log beers you've tried with ratings, tasting notes, location, and date
+- **Star Ratings**: Rate beers from 0-5 stars with half-star precision
+- **Persistent Storage**: Data stored in browser localStorage
+- **Responsive UI**: Clean, modern interface with intuitive navigation
+- **Three Pages**:
+  - Home: View all journal entries sorted by date
+  - Add Entry: Create new journal entries
+  - Entry Detail: View full details of a specific entry
+
+## Architecture
+
+This project follows clean architecture principles with clear separation of concerns:
+
+### Layers
+
+- **domain/**: Pure domain model with no external dependencies
+  - `entities/`: Domain entities (Beer, JournalEntry)
+  - `valueObjects/`: Value objects (Rating)
+  - `repositories/`: Repository interfaces
+- **application/**: Business logic orchestration via use cases
+  - `usecases/`: Use case implementations (Create, List, Get, Delete)
+- **infrastructure/**: External concerns and implementations
+  - `repositories/`: Concrete repository implementations (localStorage)
+- **presentation/**: React UI components, pages, and routing
+  - `components/`: Reusable UI components (Layout)
+  - `pages/`: Route-level page components
+- **di/**: Dependency injection container (composition root)
+- **shared/**: Cross-cutting utilities and helpers
+
+### Key Principles
+
+- **Dependency Rule**: Dependencies point inward (presentation → application → domain)
+- **Interface Segregation**: Domain defines interfaces; infrastructure implements them
+- **Single Responsibility**: Each layer has one reason to change
+- **Testability**: Business logic isolated from UI and persistence details
 
 ## Getting Started
 
@@ -17,45 +46,85 @@ A beer journaling and logging web app built with React + TypeScript using a clea
 # Install dependencies
 npm install
 
-# Start dev server
+# Start dev server (http://localhost:5173)
 npm run dev
 
 # Run tests
 npm test
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
 ```
 
-Open the app at http://localhost:5173 (default Vite port).
+## Project Structure
 
-## Notable Files
-
-- `index.html`: Vite entry HTML.
-- `src/main.tsx`: React bootstrap.
-- `src/presentation/App.tsx`: Root component.
-- `src/presentation/pages/HomePage.tsx`: Example page using a use case.
-- `src/application/usecases/ListBeersUseCase.ts`: Sample use case.
-- `src/domain/entities/Beer.ts`: Domain entity.
-- `src/domain/repositories/BeerRepository.ts`: Domain repository interface.
-- `src/infrastructure/repositories/InMemoryBeerRepository.ts`: In-memory repository implementation.
-- `src/di/container.ts`: DI wiring.
+```
+src/
+├── domain/
+│   ├── entities/
+│   │   ├── Beer.ts
+│   │   └── JournalEntry.ts
+│   ├── repositories/
+│   │   ├── BeerRepository.ts
+│   │   └── JournalEntryRepository.ts
+│   └── valueObjects/
+│       └── Rating.ts
+├── application/
+│   └── usecases/
+│       ├── CreateJournalEntryUseCase.ts
+│       ├── ListJournalEntriesUseCase.ts
+│       ├── GetJournalEntryUseCase.ts
+│       ├── DeleteJournalEntryUseCase.ts
+│       └── ListBeersUseCase.ts
+├── infrastructure/
+│   └── repositories/
+│       ├── LocalStorageBeerRepository.ts
+│       └── LocalStorageJournalEntryRepository.ts
+├── presentation/
+│   ├── components/
+│   │   └── Layout.tsx
+│   ├── pages/
+│   │   ├── HomePage.tsx
+│   │   ├── AddEntryPage.tsx
+│   │   └── EntryDetailPage.tsx
+│   └── App.tsx
+├── di/
+│   └── container.ts
+└── main.tsx
+```
 
 ## Path Aliases
 
-Configured in `tsconfig.app.json` and `vite.config.ts`:
+TypeScript path aliases configured in `tsconfig.app.json` and `vite.config.ts`:
 
-- `@domain/*` -> `src/domain/*`
-- `@application/*` -> `src/application/*`
-- `@infrastructure/*` -> `src/infrastructure/*`
-- `@presentation/*` -> `src/presentation/*`
-- `@shared/*` -> `src/shared/*`
-- `@di/*` -> `src/di/*`
+- `@domain/*` → `src/domain/*`
+- `@application/*` → `src/application/*`
+- `@infrastructure/*` → `src/infrastructure/*`
+- `@presentation/*` → `src/presentation/*`
+- `@shared/*` → `src/shared/*`
+- `@di/*` → `src/di/*`
 
-## Linting & Formatting
+## Tech Stack
 
-- ESLint: `npm run lint`
-- Prettier: `npm run format`
+- **React 18** - UI library
+- **TypeScript 5** - Type safety
+- **Vite 5** - Build tool and dev server
+- **React Router 6** - Client-side routing
+- **Vitest** - Unit testing framework
+- **Testing Library** - React component testing
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
 
-## Next Steps
+## Future Enhancements
 
-- Add create/log journal entries for beers (entity + use cases).
-- Persist to localStorage or IndexedDB, then later to a backend API.
-- Introduce routing and a proper UI library.
+- Add beer search/autocomplete from external API (e.g., Open Brewery DB)
+- Support photo uploads for entries
+- Add filtering/sorting (by rating, style, brewery)
+- Export journal data (JSON, CSV)
+- Statistics dashboard (average ratings, favorite styles)
+- Backend API integration for multi-device sync
+- PWA support for offline functionality
+- Social features (share entries, compare ratings)
