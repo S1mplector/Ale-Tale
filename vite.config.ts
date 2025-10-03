@@ -14,6 +14,14 @@ export default defineConfig({
       '@di': path.resolve(__dirname, 'src/di'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5174',
+        changeOrigin: true,
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['src/setupTests.ts'],
