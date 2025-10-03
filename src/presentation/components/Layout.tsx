@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { BeerGlass } from './BeerGlass';
 
 interface LayoutProps {
@@ -7,6 +7,10 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
+  const location = useLocation();
+  const accent = '#f1c40f';
+  const active = (path: string) => (location.pathname === path ? accent : 'transparent');
+  const activeColor = (path: string) => (location.pathname === path ? accent : '#ecf0f1');
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
       <nav
@@ -56,6 +60,31 @@ export function Layout({ children }: LayoutProps) {
           </Link>
         </div>
       </nav>
+      {/* Sub-navigation */}
+      <div style={{ background: '#34495e' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 2rem' }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link to="/" style={{
+              color: activeColor('/'),
+              textDecoration: 'none',
+              padding: '0.5rem 0.75rem',
+              borderBottom: `3px solid ${active('/')}`,
+            }}>Beers</Link>
+            <Link to="/bars" style={{
+              color: activeColor('/bars'),
+              textDecoration: 'none',
+              padding: '0.5rem 0.75rem',
+              borderBottom: `3px solid ${active('/bars')}`,
+            }}>Bars</Link>
+            <Link to="/log" style={{
+              color: activeColor('/log'),
+              textDecoration: 'none',
+              padding: '0.5rem 0.75rem',
+              borderBottom: `3px solid ${active('/log')}`,
+            }}>Log</Link>
+          </div>
+        </div>
+      </div>
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>{children}</main>
     </div>
   );

@@ -5,6 +5,8 @@ import { AddEntryPage } from '@presentation/pages/AddEntryPage';
 import { EntryDetailPage } from '@presentation/pages/EntryDetailPage';
 import { Layout } from '@presentation/components/Layout';
 import { EditEntryPage } from '@presentation/pages/EditEntryPage';
+import { BarsPage } from '@presentation/pages/BarsPage';
+import { LogPage } from '@presentation/pages/LogPage';
 import { SplashScreen } from '@presentation/components/SplashScreen';
 
 export function App() {
@@ -20,6 +22,8 @@ export function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/bars" element={<BarsPage />} />
+          <Route path="/log" element={<LogPage />} />
           <Route path="/add" element={<AddEntryPage />} />
           <Route path="/entry/:id" element={<EntryDetailPage />} />
           <Route path="/entry/:id/edit" element={<EditEntryPage />} />
