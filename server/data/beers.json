@@ -1,0 +1,12 @@
+[
+  {"id":"heineken","name":"Heineken","brewery":"Heineken","style":"Pale Lager","abv":5.0},
+  {"id":"budweiser","name":"Budweiser","brewery":"Anheuser-Busch","style":"American Lager","abv":5.0},
+  {"id":"guinness-draught","name":"Guinness Draught","brewery":"Guinness","style":"Irish Stout","abv":4.2},
+  {"id":"corona-extra","name":"Corona Extra","brewery":"Grupo Modelo","style":"Pale Lager","abv":4.6},
+  {"id":"carlsberg-pilsner","name":"Carlsberg Pilsner","brewery":"Carlsberg","style":"Pilsner","abv":5.0},
+  {"id":"stella-artois","name":"Stella Artois","brewery":"Stella Artois","style":"Pale Lager","abv":5.0},
+  {"id":"punk-ipa","name":"Punk IPA","brewery":"BrewDog","style":"IPA","abv":5.6},
+  {"id":"weihenstephaner-hefeweissbier","name":"Weihenstephaner Hefeweissbier","brewery":"Bayerische Staatsbrauerei Weihenstephan","style":"Hefeweizen","abv":5.4},
+  {"id":"pilsner-urquell","name":"Pilsner Urquell","brewery":"Plzeňský Prazdroj","style":"Pilsner","abv":4.4},
+  {"id":"sierra-nevada-pale-ale","name":"Sierra Nevada Pale Ale","brewery":"Sierra Nevada Brewing Co.","style":"American Pale Ale","abv":5.6}
+]
