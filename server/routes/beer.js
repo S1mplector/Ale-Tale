@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { searchPunk } from '../sources/punk.js';
 import { searchWikidata } from '../sources/wikidata.js';
+import { imageService } from '../services/ImageService.js';
 
 export const beerRouter = Router();
 
@@ -38,6 +39,21 @@ beerRouter.get('/aggregate/search', async (req, res) => {
     res.json({ items: Array.from(byKey.values()).slice(0, 50) });
   } catch (e) {
     console.error('beer/aggregate/search failed', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/beer/image?name=...&brewery=...&id=<wikidataId>
+beerRouter.get('/image', async (req, res) => {
+  const name = String(req.query.name || req.query.q || '').trim();
+  const brewery = String(req.query.brewery || '').trim();
+  const id = String(req.query.id || '').trim();
+  if (!name) return res.status(400).json({ error: 'Missing name' });
+  try {
+    const imageUrl = await imageService.resolve({ name, brewery, wikidataId: id });
+    res.json({ imageUrl });
+  } catch (e) {
+    console.error('beer/image failed', e);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

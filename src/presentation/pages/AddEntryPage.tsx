@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createJournalEntryUseCase, listBeersUseCase } from '@di/container';
+import { createJournalEntryUseCase } from '@di/container';
 import type { Beer } from '@domain/entities/Beer';
 import { searchBeers } from '@infrastructure/services/BeerSearchService';
+import beerPlaceholder from '../images/icons/beer_placeholder.webp';
 
 export function AddEntryPage() {
   const navigate = useNavigate();
-  const [beers, setBeers] = useState<Beer[]>([]);
   const [selectedBeer, setSelectedBeer] = useState<Beer | null>(null);
   const [rating, setRating] = useState(3);
   const [notes, setNotes] = useState('');
@@ -18,9 +18,8 @@ export function AddEntryPage() {
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<Beer[]>([]);
 
-  React.useEffect(() => {
-    listBeersUseCase.execute().then(setBeers);
-  }, []);
+  // image cache for results
+  const [thumbs, setThumbs] = useState<Record<string, string | null>>({});
 
   // Debounced async search using our API (Untappd scraper with fallback)
   React.useEffect(() => {
@@ -39,6 +38,38 @@ export function AddEntryPage() {
     }, 300);
     return () => clearTimeout(t);
   }, [query]);
+
+  // fetch thumbnails for visible results (only if not already present)
+  React.useEffect(() => {
+    const abort = new AbortController();
+    async function run() {
+      const updates: Record<string, string | null> = {};
+      await Promise.all(
+        results.map(async (b) => {
+          if (b.id in thumbs) return;
+          if ((b as any).imageUrl) {
+            updates[b.id] = (b as any).imageUrl || null;
+            return;
+          }
+          try {
+            const params = new URLSearchParams({
+              name: b.name,
+              brewery: b.brewery || '',
+              id: (b as any).origin === 'wikidata' ? (b.id || '') : '',
+            });
+            const res = await fetch(`/api/beer/image?${params.toString()}`, { signal: abort.signal });
+            if (res.ok) {
+              const data = await res.json();
+              updates[b.id] = data?.imageUrl || null;
+            }
+          } catch {}
+        })
+      );
+      if (Object.keys(updates).length) setThumbs((prev) => ({ ...prev, ...updates }));
+    }
+    if (results.length) run();
+    return () => abort.abort();
+  }, [results]);
 
   
 
@@ -102,9 +133,20 @@ export function AddEntryPage() {
                   setSelectedBeer(beer);
                   setStep('details');
                 }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'white', border: 'none', borderTop: '1px solid #f2f2f2', cursor: 'pointer' }}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '0.75rem 1rem', background: 'white', border: 'none', borderTop: '1px solid #f2f2f2', cursor: 'pointer' }}
               >
-                <span>
+                <img
+                  src={(thumbs[beer.id] as string) || beerPlaceholder}
+                  alt=""
+                  width={32}
+                  height={32}
+                  style={{ objectFit: 'cover', borderRadius: 4, background: '#f0f0f0' }}
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img.src !== beerPlaceholder) img.src = beerPlaceholder;
+                  }}
+                />
+                <span style={{ flex: 1 }}>
                   <strong>{beer.name}</strong>
                   <span style={{ color: '#7f8c8d' }}> — {beer.brewery}</span>
                 </span>
@@ -112,25 +154,6 @@ export function AddEntryPage() {
               </button>
             ))}
           </div>
-
-          {/* Fallback: local list */}
-          {results.length === 0 && !searching && (
-            <div style={{ marginTop: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Or pick from local list</label>
-              <select
-                value={selectedBeer?.id || ''}
-                onChange={(e) => setSelectedBeer(beers.find((b) => b.id === e.target.value) || null)}
-                style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', border: '1px solid #ddd', borderRadius: 4 }}
-              >
-                <option value="">Select a beer...</option>
-                {beers.map((beer) => (
-                  <option key={beer.id} value={beer.id}>
-                    {beer.name} - {beer.brewery}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
             <button
