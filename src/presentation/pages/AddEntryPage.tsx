@@ -4,6 +4,7 @@ import { createJournalEntryUseCase } from '@di/container';
 import type { Beer } from '@domain/entities/Beer';
 import { searchBeers } from '@infrastructure/services/BeerSearchService';
 import beerPlaceholder from '../images/icons/beer_placeholder.webp';
+import { ManualBeerForm } from '@presentation/components/ManualBeerForm';
 
 export function AddEntryPage() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export function AddEntryPage() {
   const [location, setLocation] = useState('');
   const [drankAt, setDrankAt] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'select' | 'details'>('select');
+  const [step, setStep] = useState<'select' | 'manual' | 'details'>('select');
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<Beer[]>([]);
@@ -112,7 +113,7 @@ export function AddEntryPage() {
 
       {/* Step 1: async search */}
       {step === 'select' && (
-        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 600, marginBottom: '1.5rem' }}>
+        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 800, width: '100%', marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Search a beer</label>
           <input
             type="text"
@@ -170,10 +171,31 @@ export function AddEntryPage() {
             >
               Continue
             </button>
+            <button
+              type="button"
+              onClick={() => setStep('manual')}
+              style={{ padding: '0.6rem 1rem', border: '1px solid #ddd', borderRadius: 4, background: 'white' }}
+            >
+              Add manually
+            </button>
             <button type="button" onClick={() => navigate('/')} style={{ padding: '0.6rem 1rem', border: '1px solid #ddd', borderRadius: 4, background: 'white' }}>
               Cancel
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Step: Manual add beer */}
+      {step === 'manual' && (
+        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 800, width: '100%', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: 0, marginBottom: '1rem', color: '#2c3e50' }}>Add Beer Details</h3>
+          <ManualBeerForm
+            onCancel={() => setStep('select')}
+            onUse={(beer: Beer) => {
+              setSelectedBeer(beer);
+              setStep('details');
+            }}
+          />
         </div>
       )}
 

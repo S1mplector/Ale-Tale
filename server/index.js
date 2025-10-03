@@ -12,6 +12,9 @@ import { beerRouter } from './routes/beer.js';
 const app = express();
 const PORT = process.env.PORT || 5174;
 
+// JSON body parsing for API endpoints
+app.use(express.json());
+
 // Load local beers dataset for reliable results without scraping
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

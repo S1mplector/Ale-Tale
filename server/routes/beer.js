@@ -3,6 +3,7 @@ import { Readable } from 'node:stream';
 import { searchPunk } from '../sources/punk.js';
 import { searchWikidata } from '../sources/wikidata.js';
 import { imageService } from '../services/ImageService.js';
+import { addManualBeer, searchManualBeers } from '../services/ManualBeerStore.js';
 
 export const beerRouter = Router();
 
@@ -14,6 +15,41 @@ beerRouter.get('/search', async (req, res) => {
     res.json({ items });
   } catch (e) {
     console.error('beer/search failed', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Save a manually entered beer
+beerRouter.post('/manual', async (req, res) => {
+  try {
+    const { id, name, brewery, style = '', abv = 0, imageUrl = null } = req.body || {};
+    if (!name || !brewery) return res.status(400).json({ error: 'name and brewery are required' });
+    const payload = {
+      id: String(id || `manual:${Date.now()}`),
+      name: String(name),
+      brewery: String(brewery),
+      style: String(style || ''),
+      abv: typeof abv === 'number' ? abv : parseFloat(abv) || 0,
+      imageUrl: imageUrl || null,
+      origin: 'manual',
+    };
+    addManualBeer(payload);
+    res.json(payload);
+  } catch (e) {
+    console.error('beer/manual POST failed', e);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Search from locally saved manual beers
+beerRouter.get('/manual/search', async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  if (!q) return res.json({ items: [] });
+  try {
+    const items = searchManualBeers(q);
+    res.json({ items });
+  } catch (e) {
+    console.error('beer/manual/search failed', e);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -61,12 +97,14 @@ beerRouter.get('/aggregate/search', async (req, res) => {
     ]);
     const wikidata = w.status === 'fulfilled' ? w.value : [];
     const punk = p.status === 'fulfilled' ? p.value : [];
+    const manual = searchManualBeers(q) || [];
 
     const byKey = new Map();
     const push = (item) => {
       const key = `${item.name.toLowerCase()}|${(item.brewery || '').toLowerCase()}`;
       if (!byKey.has(key)) byKey.set(key, item);
     };
+    manual.forEach(push);
     wikidata.forEach(push);
     punk.forEach(push);
 
