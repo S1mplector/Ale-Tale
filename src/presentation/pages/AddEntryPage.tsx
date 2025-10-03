@@ -143,7 +143,13 @@ export function AddEntryPage() {
                   style={{ objectFit: 'cover', borderRadius: 4, background: '#f0f0f0' }}
                   onError={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
-                    if (img.src !== beerPlaceholder) img.src = beerPlaceholder;
+                    const original = String(thumbs[beer.id] || '');
+                    const isProxy = img.src.includes('/api/beer/image/proxy');
+                    if (original && !isProxy) {
+                      img.src = `/api/beer/image/proxy?url=${encodeURIComponent(original)}`;
+                    } else if (img.src !== beerPlaceholder) {
+                      img.src = beerPlaceholder;
+                    }
                   }}
                 />
                 <span style={{ flex: 1 }}>
