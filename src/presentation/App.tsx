@@ -10,6 +10,10 @@ import { AddBarPage } from '@presentation/pages/AddBarPage';
 import { BarDetailPage } from '@presentation/pages/BarDetailPage';
 import { EditBarPage } from '@presentation/pages/EditBarPage';
 import { LogPage } from '@presentation/pages/LogPage';
+import { MyBeersPage } from '@presentation/pages/MyBeersPage';
+import { StatisticsPage } from '@presentation/pages/StatisticsPage';
+import { SearchPage } from '@presentation/pages/SearchPage';
+import { SettingsPage } from '@presentation/pages/SettingsPage';
 import { SplashScreen } from '@presentation/components/SplashScreen';
 
 export function App() {
@@ -33,6 +37,10 @@ export function App() {
           <Route path="/add" element={<AddEntryPage />} />
           <Route path="/entry/:id" element={<EntryDetailPage />} />
           <Route path="/entry/:id/edit" element={<EditEntryPage />} />
+          <Route path="/my-beers" element={<MyBeersPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

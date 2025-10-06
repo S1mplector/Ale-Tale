@@ -17,19 +17,21 @@ export function Layout({ children }: LayoutProps) {
         style={{
           backgroundColor: '#2c3e50',
           color: 'white',
-          padding: '1rem 2rem',
+          padding: '0.75rem 2rem',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
         <div
           style={{
-            maxWidth: 1200,
+            maxWidth: 1400,
             margin: '0 auto',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: '2rem',
           }}
         >
+          {/* Logo/Brand */}
           <Link
             to="/"
             style={{
@@ -38,6 +40,7 @@ export function Layout({ children }: LayoutProps) {
               display: 'flex',
               alignItems: 'center',
               gap: '0.75rem',
+              flexShrink: 0,
             }}
           >
             <div style={{ transform: 'scale(0.35)', transformOrigin: 'left center' }}>
@@ -45,24 +48,113 @@ export function Layout({ children }: LayoutProps) {
             </div>
             <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Ale Tale</h1>
           </Link>
-          <Link
-            to="/add"
-            style={{
-              backgroundColor: '#3498db',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: 4,
-              textDecoration: 'none',
-              fontWeight: 500,
-            }}
-          >
-            + New Entry
-          </Link>
+
+          {/* Center Navigation */}
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+            <Link
+              to="/my-beers"
+              style={{
+                color: '#ecf0f1',
+                textDecoration: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: 4,
+                fontSize: '0.9375rem',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent'}
+            >
+              🍺 My Beers
+            </Link>
+            <Link
+              to="/statistics"
+              style={{
+                color: '#ecf0f1',
+                textDecoration: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: 4,
+                fontSize: '0.9375rem',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent'}
+            >
+              📊 Statistics
+            </Link>
+            <Link
+              to="/search"
+              style={{
+                color: '#ecf0f1',
+                textDecoration: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: 4,
+                fontSize: '0.9375rem',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent'}
+            >
+              🔍 Search
+            </Link>
+          </div>
+
+          {/* Right Actions */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0 }}>
+            <Link
+              to="/add"
+              style={{
+                backgroundColor: '#27ae60',
+                color: 'white',
+                padding: '0.625rem 1.25rem',
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              }}
+            >
+              + New Entry
+            </Link>
+            <Link
+              to="/settings"
+              style={{
+                color: '#ecf0f1',
+                textDecoration: 'none',
+                padding: '0.5rem',
+                borderRadius: 4,
+                fontSize: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
+              }}
+              title="Settings"
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent'}
+            >
+              ⚙️
+            </Link>
+          </div>
         </div>
       </nav>
       {/* Sub-navigation */}
       <div style={{ background: '#34495e' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 2rem' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 2rem' }}>
           <div style={{ display: 'flex', gap: 8 }}>
             <Link to="/" style={{
               color: activeColor('/'),
@@ -85,7 +177,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </div>
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>{children}</main>
+      <main style={{ maxWidth: 1400, margin: '0 auto', padding: '2rem' }}>{children}</main>
     </div>
   );
 }
