@@ -53,7 +53,7 @@ export function ManualBeerForm({ onUse, onCancel }: ManualBeerFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Carlsberg Pilsner"
-          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4 }}
+          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4, boxSizing: 'border-box' }}
           required
         />
       </div>
@@ -64,7 +64,7 @@ export function ManualBeerForm({ onUse, onCancel }: ManualBeerFormProps) {
           value={brewery}
           onChange={(e) => setBrewery(e.target.value)}
           placeholder="e.g., Carlsberg Group"
-          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4 }}
+          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4, boxSizing: 'border-box' }}
           required
         />
       </div>
@@ -75,7 +75,7 @@ export function ManualBeerForm({ onUse, onCancel }: ManualBeerFormProps) {
           value={style}
           onChange={(e) => setStyle(e.target.value)}
           placeholder="e.g., Pilsner"
-          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4 }}
+          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4, boxSizing: 'border-box' }}
         />
       </div>
       <div>
@@ -88,7 +88,7 @@ export function ManualBeerForm({ onUse, onCancel }: ManualBeerFormProps) {
           value={abv}
           onChange={(e) => setAbv(e.target.value)}
           placeholder="e.g., 5.0"
-          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4 }}
+          style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: 4, boxSizing: 'border-box' }}
         />
       </div>
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>

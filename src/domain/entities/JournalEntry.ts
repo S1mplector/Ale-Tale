@@ -21,6 +21,7 @@ export interface JournalEntry {
   servingType?: string; // Draft, Bottle, Can
   glassware?: string; // Pint, Tulip, Snifter, etc.
   pairingFood?: string; // What food was paired
+  imageUrl?: string; // Photo of the beer
   drankAt: Date;
   createdAt: Date;
 }
@@ -42,5 +43,6 @@ export interface CreateJournalEntryInput {
   servingType?: string;
   glassware?: string;
   pairingFood?: string;
+  imageUrl?: string;
   drankAt: Date;
 }

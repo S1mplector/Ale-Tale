@@ -113,6 +113,22 @@ export function EntryDetailPage() {
           </div>
         </div>
 
+        {entry.imageUrl && (
+          <div style={{ marginBottom: '2rem' }}>
+            <img
+              src={entry.imageUrl}
+              alt={entry.beerName}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '400px',
+                borderRadius: 8,
+                objectFit: 'contain',
+                border: '2px solid #ecf0f1',
+              }}
+            />
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
           <div>
             <h3 style={{ margin: 0, marginBottom: '0.75rem', color: '#2c3e50', fontSize: '1.125rem' }}>

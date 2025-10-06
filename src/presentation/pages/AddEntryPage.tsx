@@ -21,6 +21,7 @@ export function AddEntryPage() {
   const [servingType, setServingType] = useState('');
   const [glassware, setGlassware] = useState('');
   const [pairingFood, setPairingFood] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'select' | 'manual' | 'details'>('select');
   const [query, setQuery] = useState('');
@@ -81,6 +82,22 @@ export function AddEntryPage() {
   }, [results]);
 
   
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +122,7 @@ export function AddEntryPage() {
         servingType: servingType || undefined,
         glassware: glassware || undefined,
         pairingFood: pairingFood || undefined,
+        imageUrl: imageUrl || undefined,
         drankAt: new Date(drankAt),
       });
       navigate('/');
@@ -129,14 +147,14 @@ export function AddEntryPage() {
 
       {/* Step 1: async search */}
       {step === 'select' && (
-        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 800, width: '100%', marginBottom: '1.5rem' }}>
+        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 1200, width: '100%', marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Search a beer</label>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type to search Untappd..."
-            style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', border: '1px solid #ddd', borderRadius: 4 }}
+            style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', border: '1px solid #ddd', borderRadius: 4, boxSizing: 'border-box' }}
             autoFocus
           />
           <div style={{ marginTop: '0.75rem', maxHeight: 260, overflow: 'auto', border: results.length ? '1px solid #eee' : 'none', borderRadius: 6 }}>
@@ -203,7 +221,7 @@ export function AddEntryPage() {
 
       {/* Step: Manual add beer */}
       {step === 'manual' && (
-        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 800, width: '100%', marginBottom: '1.5rem' }}>
+        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 1200, width: '100%', marginBottom: '1.5rem' }}>
           <h3 style={{ margin: 0, marginBottom: '1rem', color: '#2c3e50' }}>Add Beer Details</h3>
           <ManualBeerForm
             onCancel={() => setStep('select')}
@@ -217,7 +235,7 @@ export function AddEntryPage() {
 
       {/* Step 2: details */}
       {step === 'details' && (
-        <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 800 }}>
+        <form onSubmit={handleSubmit} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: 8, boxShadow: '0 2px 4px rgba(0,0,0,0.1)', maxWidth: 1200, width: '100%' }}>
           <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: 6 }}>
             <div style={{ fontSize: '0.875rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>Selected Beer:</div>
             <div style={{ fontSize: '1.125rem', fontWeight: 600, color: '#2c3e50' }}>
@@ -231,7 +249,7 @@ export function AddEntryPage() {
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#2c3e50' }}>Rating * ({rating}/5)</label>
               <input type="range" min="0" max="5" step="0.5" value={rating} onChange={(e) => setRating(parseFloat(e.target.value))} style={{ width: '100%' }} />
@@ -312,6 +330,61 @@ export function AddEntryPage() {
                 placeholder="Where did you drink it?"
                 style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', border: '1px solid #ddd', borderRadius: 4 }}
               />
+            </div>
+          </div>
+
+          <div style={{ marginTop: '1.5rem', borderTop: '2px solid #ecf0f1', paddingTop: '1.5rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#2c3e50', fontSize: '1.125rem' }}>Beer Photo</h3>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#2c3e50' }}>
+                Upload Photo (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  fontSize: '1rem',
+                  border: '1px solid #ddd',
+                  borderRadius: 4,
+                  boxSizing: 'border-box',
+                }}
+              />
+              {imageUrl && (
+                <div style={{ marginTop: '1rem' }}>
+                  <img
+                    src={imageUrl}
+                    alt="Beer preview"
+                    style={{
+                      maxWidth: '300px',
+                      maxHeight: '300px',
+                      borderRadius: 8,
+                      objectFit: 'cover',
+                      border: '2px solid #ecf0f1',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl('')}
+                    style={{
+                      display: 'block',
+                      marginTop: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      backgroundColor: '#e74c3c',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 4,
+                      fontSize: '0.875rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Remove Image
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
