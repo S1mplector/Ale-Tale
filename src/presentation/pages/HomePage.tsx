@@ -92,73 +92,88 @@ export function HomePage() {
   }
 
   return (
-    <div>
-      <h2 style={{ marginBottom: '1rem', color: '#2c3e50' }}>
-        Your Journal ({filtered.length} {filtered.length === 1 ? 'entry' : 'entries'})
-      </h2>
+    <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h2 style={{ margin: 0, color: '#2c3e50' }}>
+          Your Beer Journal ({filtered.length} {filtered.length === 1 ? 'entry' : 'entries'})
+        </h2>
+        <Link
+          to="/add"
+          style={{
+            display: 'inline-block',
+            backgroundColor: '#3498db',
+            color: 'white',
+            padding: '0.75rem 1.5rem',
+            borderRadius: 4,
+            textDecoration: 'none',
+            fontWeight: 500,
+            fontSize: '0.875rem',
+          }}
+        >
+          + Add Entry
+        </Link>
+      </div>
 
       {/* Toolbar */}
       <div
         style={{
           display: 'grid',
-          gap: '0.75rem',
+          gap: '1rem',
           backgroundColor: 'white',
-          padding: '1rem',
-          marginBottom: '1.5rem',
+          padding: '1.5rem',
+          marginBottom: '2rem',
           borderRadius: 8,
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
         }}
       >
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by beer, brewery, or style"
-            style={{
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: 4,
-            }}
-          />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d' }}>
-                Min Rating: {minRating}
-              </label>
-              <input
-                type="range"
-                min={0}
-                max={5}
-                step={0.5}
-                value={minRating}
-                onChange={(e) => setMinRating(parseFloat(e.target.value))}
-                style={{ width: '100%' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d' }}>
-                Max Rating: {maxRating}
-              </label>
-              <input
-                type="range"
-                min={0}
-                max={5}
-                step={0.5}
-                value={maxRating}
-                onChange={(e) => setMaxRating(parseFloat(e.target.value))}
-                style={{ width: '100%' }}
-              />
-            </div>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="🔍 Search by beer name, brewery, or style..."
+          style={{
+            padding: '0.875rem',
+            fontSize: '1rem',
+            border: '1px solid #ddd',
+            borderRadius: 4,
+          }}
+        />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d', marginBottom: '0.5rem' }}>
+              Min Rating: <strong>{minRating}</strong> ⭐
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={5}
+              step={0.5}
+              value={minRating}
+              onChange={(e) => setMinRating(parseFloat(e.target.value))}
+              style={{ width: '100%' }}
+            />
           </div>
-          <div style={{ fontSize: '0.875rem', color: '#95a5a6' }}>
-            Showing {filtered.length} of {entries.length} entries
+          <div>
+            <label style={{ display: 'block', fontSize: '0.875rem', color: '#7f8c8d', marginBottom: '0.5rem' }}>
+              Max Rating: <strong>{maxRating}</strong> ⭐
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={5}
+              step={0.5}
+              value={maxRating}
+              onChange={(e) => setMaxRating(parseFloat(e.target.value))}
+              style={{ width: '100%' }}
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', fontSize: '0.875rem', color: '#95a5a6' }}>
+            Showing <strong style={{ margin: '0 0.25rem', color: '#3498db' }}>{filtered.length}</strong> of <strong style={{ margin: '0 0.25rem' }}>{entries.length}</strong> entries
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '1.5rem' }}>
         {filtered.map((entry) => (
           <div
             key={entry.id}
@@ -167,39 +182,49 @@ export function HomePage() {
               padding: '1.5rem',
               borderRadius: 8,
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              display: 'grid',
+              display: 'flex',
+              flexDirection: 'column',
               gap: '1rem',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-              <div style={{ flex: 1 }}>
-                <Link
-                  to={`/entry/${entry.id}`}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <h3 style={{ margin: 0, color: '#2c3e50', fontSize: '1.25rem' }}>
-                    {entry.beerName}
-                  </h3>
-                </Link>
-                <p style={{ margin: '0.25rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
-                  {entry.brewery} • {entry.style} • {entry.abv}% ABV
-                </p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div
+            <div>
+              <Link
+                to={`/entry/${entry.id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <h3 style={{ margin: 0, color: '#2c3e50', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+                  {entry.beerName}
+                </h3>
+              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <span
                   style={{
-                    fontSize: '1.5rem',
+                    fontSize: '1.25rem',
                     color: '#f39c12',
-                    marginBottom: '0.25rem',
-                    letterSpacing: '2px',
+                    letterSpacing: '1px',
                   }}
                 >
                   {renderStars(entry.rating)}
-                </div>
-                <div style={{ fontSize: '0.875rem', color: '#7f8c8d' }}>
+                </span>
+                <span style={{ fontSize: '0.875rem', color: '#7f8c8d', fontWeight: 600 }}>
                   {entry.rating.toFixed(1)}/5
-                </div>
+                </span>
               </div>
+              <p style={{ margin: 0, color: '#7f8c8d', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                🍺 <strong>{entry.brewery}</strong><br />
+                🏷️ {entry.style}<br />
+                📊 {entry.abv}% ABV
+              </p>
             </div>
 
             {entry.notes && (
@@ -210,23 +235,23 @@ export function HomePage() {
                   fontSize: '0.875rem',
                   lineHeight: 1.6,
                   borderLeft: '3px solid #3498db',
-                  paddingLeft: '1rem',
+                  paddingLeft: '0.75rem',
+                  backgroundColor: '#f8f9fa',
+                  padding: '0.75rem',
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
                 }}
               >
                 {entry.notes}
               </p>
             )}
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingTop: '0.5rem',
-                borderTop: '1px solid #ecf0f1',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#7f8c8d' }}>
+            <div style={{ marginTop: 'auto', paddingTop: '0.75rem', borderTop: '1px solid #ecf0f1' }}>
+              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#7f8c8d', marginBottom: '0.75rem' }}>
                 <span>📅 {formatDate(entry.drankAt)}</span>
                 {entry.location && <span>📍 {entry.location}</span>}
               </div>
@@ -234,15 +259,18 @@ export function HomePage() {
                 <Link
                   to={`/entry/${entry.id}`}
                   style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: '#ecf0f1',
-                    color: '#2c3e50',
+                    flex: 1,
+                    padding: '0.5rem',
+                    backgroundColor: '#3498db',
+                    color: 'white',
                     borderRadius: 4,
                     textDecoration: 'none',
                     fontSize: '0.875rem',
+                    textAlign: 'center',
+                    fontWeight: 500,
                   }}
                 >
-                  View
+                  View Details
                 </Link>
                 <button
                   onClick={() => handleDelete(entry.id)}
@@ -254,6 +282,7 @@ export function HomePage() {
                     borderRadius: 4,
                     fontSize: '0.875rem',
                     cursor: 'pointer',
+                    fontWeight: 500,
                   }}
                 >
                   Delete

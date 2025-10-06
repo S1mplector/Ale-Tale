@@ -10,9 +10,17 @@ export interface JournalEntry {
   brewery: string;
   style: string;
   abv: number;
+  ibu?: number; // International Bitterness Units
   rating: number;
-  notes: string;
+  appearance?: string; // Visual notes (color, clarity, head)
+  aroma?: string; // Smell notes
+  taste?: string; // Flavor notes
+  mouthfeel?: string; // Texture, body, carbonation
+  notes: string; // Overall notes
   location?: string;
+  servingType?: string; // Draft, Bottle, Can
+  glassware?: string; // Pint, Tulip, Snifter, etc.
+  pairingFood?: string; // What food was paired
   drankAt: Date;
   createdAt: Date;
 }
@@ -23,8 +31,16 @@ export interface CreateJournalEntryInput {
   brewery: string;
   style: string;
   abv: number;
+  ibu?: number;
   rating: number;
+  appearance?: string;
+  aroma?: string;
+  taste?: string;
+  mouthfeel?: string;
   notes: string;
   location?: string;
+  servingType?: string;
+  glassware?: string;
+  pairingFood?: string;
   drankAt: Date;
 }

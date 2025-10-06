@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getJournalEntryUseCase, deleteJournalEntryUseCase } from '@di/container';
-import type { JournalEntry } from '@domain/entities/JournalEntry';
+import { getBarUseCase, deleteBarUseCase } from '@di/container';
+import type { Bar } from '@domain/entities/Bar';
 
-export function EntryDetailPage() {
+export function BarDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [entry, setEntry] = useState<JournalEntry | null>(null);
+  const [bar, setBar] = useState<Bar | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
-    getJournalEntryUseCase.execute(id).then((data) => {
-      setEntry(data);
+    getBarUseCase.execute(id).then((data) => {
+      setBar(data);
       setLoading(false);
     });
   }, [id]);
 
   const handleDelete = async () => {
-    if (!id || !confirm('Delete this entry?')) return;
-    await deleteJournalEntryUseCase.execute(id);
-    navigate('/');
+    if (!id || !confirm('Delete this bar?')) return;
+    await deleteBarUseCase.execute(id);
+    navigate('/bars');
   };
 
   const formatDate = (date: Date) => {
@@ -50,12 +50,12 @@ export function EntryDetailPage() {
     return <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>;
   }
 
-  if (!entry) {
+  if (!bar) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-        <h2 style={{ color: '#2c3e50', marginBottom: '1rem' }}>Entry not found</h2>
+        <h2 style={{ color: '#2c3e50', marginBottom: '1rem' }}>Bar not found</h2>
         <Link
-          to="/"
+          to="/bars"
           style={{
             display: 'inline-block',
             backgroundColor: '#3498db',
@@ -66,7 +66,7 @@ export function EntryDetailPage() {
             fontWeight: 500,
           }}
         >
-          Back to Journal
+          Back to Bars
         </Link>
       </div>
     );
@@ -76,7 +76,7 @@ export function EntryDetailPage() {
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <Link
-          to="/"
+          to="/bars"
           style={{
             color: '#3498db',
             textDecoration: 'none',
@@ -86,7 +86,7 @@ export function EntryDetailPage() {
             gap: '0.5rem',
           }}
         >
-          ← Back to Journal
+          ← Back to Bars
         </Link>
       </div>
 
@@ -100,16 +100,14 @@ export function EntryDetailPage() {
       >
         <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '2px solid #ecf0f1' }}>
           <h1 style={{ margin: 0, marginBottom: '0.75rem', color: '#2c3e50', fontSize: '2.5rem' }}>
-            {entry.beerName}
+            {bar.name}
           </h1>
-          <p style={{ margin: 0, color: '#7f8c8d', fontSize: '1.25rem', marginBottom: '1rem' }}>
-            🍺 {entry.brewery} • 🏷️ {entry.style}
+          <p style={{ margin: 0, color: '#7f8c8d', fontSize: '1.125rem', marginBottom: '0.75rem' }}>
+            📍 {bar.address}, {bar.city}
           </p>
           <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', fontSize: '1rem', color: '#7f8c8d' }}>
-            <span><strong>ABV:</strong> {entry.abv}%</span>
-            {entry.ibu && <span><strong>IBU:</strong> {entry.ibu}</span>}
-            {entry.servingType && <span><strong>Serving:</strong> {entry.servingType}</span>}
-            {entry.glassware && <span><strong>Glass:</strong> {entry.glassware}</span>}
+            {bar.atmosphere && <span><strong>Atmosphere:</strong> {bar.atmosphere}</span>}
+            {bar.priceRange && <span><strong>Price Range:</strong> {bar.priceRange}</span>}
           </div>
         </div>
 
@@ -126,71 +124,69 @@ export function EntryDetailPage() {
                   letterSpacing: '4px',
                 }}
               >
-                {renderStars(entry.rating)}
+                {renderStars(bar.rating)}
               </span>
               <span style={{ fontSize: '1.5rem', fontWeight: 600, color: '#2c3e50' }}>
-                {entry.rating.toFixed(1)}/5
+                {bar.rating.toFixed(1)}/5
               </span>
             </div>
           </div>
 
           <div>
             <h3 style={{ margin: 0, marginBottom: '0.75rem', color: '#2c3e50', fontSize: '1.125rem' }}>
-              When & Where
+              Visited Date
             </h3>
-            <p style={{ margin: 0, color: '#34495e', fontSize: '1rem', lineHeight: 1.8 }}>
-              📅 {formatDate(entry.drankAt)}
-              {entry.location && <><br />📍 {entry.location}</>}
-              {entry.pairingFood && <><br />🍴 Paired with: {entry.pairingFood}</>}
+            <p style={{ margin: 0, color: '#34495e', fontSize: '1rem' }}>
+              📅 {formatDate(bar.visitedAt)}
             </p>
           </div>
         </div>
 
-        {(entry.appearance || entry.aroma || entry.taste || entry.mouthfeel) && (
+        {(bar.beerSelection || bar.favoriteBeers || bar.foodQuality || bar.service) && (
           <div style={{ borderTop: '2px solid #ecf0f1', paddingTop: '2rem', marginBottom: '2rem' }}>
-            <h3 style={{ margin: '0 0 1.5rem 0', color: '#2c3e50', fontSize: '1.25rem' }}>Detailed Tasting Notes</h3>
+            <h3 style={{ margin: '0 0 1.5rem 0', color: '#2c3e50', fontSize: '1.25rem' }}>Detailed Review</h3>
             
             <div style={{ display: 'grid', gap: '1.5rem' }}>
-              {entry.appearance && (
+              {bar.beerSelection && (
                 <div>
                   <h4 style={{ margin: 0, marginBottom: '0.5rem', color: '#34495e', fontSize: '1rem', fontWeight: 600 }}>
-                    👁️ Appearance
+                    🍺 Beer Selection
                   </h4>
                   <p style={{ margin: 0, color: '#555', fontSize: '0.9375rem', lineHeight: 1.7, backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: 4 }}>
-                    {entry.appearance}
+                    {bar.beerSelection}
                   </p>
                 </div>
               )}
 
-              {entry.aroma && (
+              {bar.favoriteBeers && (
                 <div>
                   <h4 style={{ margin: 0, marginBottom: '0.5rem', color: '#34495e', fontSize: '1rem', fontWeight: 600 }}>
-                    👃 Aroma
+                    ⭐ Favorite Beers Tried Here
                   </h4>
                   <p style={{ margin: 0, color: '#555', fontSize: '0.9375rem', lineHeight: 1.7, backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: 4 }}>
-                    {entry.aroma}
+                    {bar.favoriteBeers}
                   </p>
                 </div>
               )}
 
-              {entry.taste && (
+              {bar.foodQuality && (
                 <div>
                   <h4 style={{ margin: 0, marginBottom: '0.5rem', color: '#34495e', fontSize: '1rem', fontWeight: 600 }}>
-                    👅 Taste
+                    🍔 Food Quality
                   </h4>
                   <p style={{ margin: 0, color: '#555', fontSize: '0.9375rem', lineHeight: 1.7, backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: 4 }}>
-                    {entry.taste}
+                    {bar.foodQuality}
                   </p>
                 </div>
               )}
 
-              {entry.mouthfeel && (
+              {bar.service && (
                 <div>
                   <h4 style={{ margin: 0, marginBottom: '0.5rem', color: '#34495e', fontSize: '1rem', fontWeight: 600 }}>
-                    🥃 Mouthfeel
+                    👥 Service
                   </h4>
                   <p style={{ margin: 0, color: '#555', fontSize: '0.9375rem', lineHeight: 1.7, backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: 4 }}>
-                    {entry.mouthfeel}
+                    {bar.service}
                   </p>
                 </div>
               )}
@@ -198,7 +194,32 @@ export function EntryDetailPage() {
           </div>
         )}
 
-        {entry.notes && (
+        {bar.amenities && bar.amenities.length > 0 && (
+          <div style={{ borderTop: '2px solid #ecf0f1', paddingTop: '2rem', marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#2c3e50', fontSize: '1.125rem' }}>
+              Amenities
+            </h3>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {bar.amenities.map((amenity) => (
+                <span
+                  key={amenity}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#e3f2fd',
+                    color: '#1976d2',
+                    borderRadius: 20,
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  {amenity}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {bar.notes && (
           <div style={{ borderTop: '2px solid #ecf0f1', paddingTop: '2rem', marginBottom: '2rem' }}>
             <h3 style={{ margin: 0, marginBottom: '0.75rem', color: '#2c3e50', fontSize: '1.125rem' }}>
               Overall Notes
@@ -216,7 +237,7 @@ export function EntryDetailPage() {
                 border: '1px solid #e9ecef',
               }}
             >
-              {entry.notes}
+              {bar.notes}
             </p>
           </div>
         )}
@@ -230,12 +251,12 @@ export function EntryDetailPage() {
             marginBottom: '2rem',
           }}
         >
-          Entry created on {formatDate(entry.createdAt)}
+          Entry created on {formatDate(bar.createdAt)}
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <Link
-            to={`/entry/${entry.id}/edit`}
+            to={`/bars/${bar.id}/edit`}
             style={{
               padding: '0.875rem 1.75rem',
               backgroundColor: '#3498db',
@@ -247,7 +268,7 @@ export function EntryDetailPage() {
               textDecoration: 'none',
             }}
           >
-            ✏️ Edit Entry
+            ✏️ Edit Bar
           </Link>
           <button
             onClick={handleDelete}
@@ -262,7 +283,7 @@ export function EntryDetailPage() {
               cursor: 'pointer',
             }}
           >
-            🗑️ Delete Entry
+            🗑️ Delete Bar
           </button>
         </div>
       </div>
