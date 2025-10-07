@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabaseService } from '@infrastructure/database/SupabaseService';
 import { syncService, SyncStatus } from '@infrastructure/database/SyncService';
 
 export function CloudSyncSettings() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [showAuthForm, setShowAuthForm] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
-  
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -33,45 +26,6 @@ export function CloudSyncSettings() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setAuthError(null);
-    setAuthSuccess(null);
-
-    try {
-      if (authMode === 'signup') {
-        const { user, error } = await supabaseService.signUp(email, password);
-        if (error) {
-          setAuthError(error.message);
-        } else {
-          setAuthSuccess('Account created! Please check your email to verify.');
-          setEmail('');
-          setPassword('');
-        }
-      } else {
-        const { user, error } = await supabaseService.signIn(email, password);
-        if (error) {
-          setAuthError(error.message);
-        } else {
-          setIsAuthenticated(true);
-          setUserEmail(user?.email || null);
-          setShowAuthForm(false);
-          setAuthSuccess('Signed in successfully!');
-          
-          // Start auto-sync
-          syncService.startAutoSync();
-          
-          // Trigger initial sync
-          handleSync();
-        }
-      }
-    } catch (error) {
-      setAuthError((error as Error).message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleSignOut = async () => {
     try {
@@ -127,144 +81,41 @@ export function CloudSyncSettings() {
 
       {!isAuthenticated ? (
         <>
-          {!showAuthForm ? (
-            <>
-              <p style={{ margin: '0 0 1rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
-                Sign in to enable multi-device sync and cloud backups.
-              </p>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
-                  onClick={() => { setShowAuthForm(true); setAuthMode('signin'); }}
-                  style={{
-                    padding: '0.625rem 1.25rem',
-                    backgroundColor: '#3498db',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                  }}
-                >
-                  🔐 Sign In
-                </button>
-                <button
-                  onClick={() => { setShowAuthForm(true); setAuthMode('signup'); }}
-                  style={{
-                    padding: '0.625rem 1.25rem',
-                    backgroundColor: '#27ae60',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                  }}
-                >
-                  ✨ Sign Up
-                </button>
-              </div>
-            </>
-          ) : (
-            <form onSubmit={handleAuth} style={{ display: 'grid', gap: '0.75rem' }}>
-              {authError && (
-                <div style={{ padding: '0.75rem', backgroundColor: '#fee', color: '#c00', borderRadius: 4, fontSize: '0.875rem' }}>
-                  {authError}
-                </div>
-              )}
-              {authSuccess && (
-                <div style={{ padding: '0.75rem', backgroundColor: '#efe', color: '#060', borderRadius: 4, fontSize: '0.875rem' }}>
-                  {authSuccess}
-                </div>
-              )}
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  padding: '0.625rem',
-                  border: '1px solid #ddd',
-                  borderRadius: 4,
-                  fontSize: '0.875rem',
-                }}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                style={{
-                  padding: '0.625rem',
-                  border: '1px solid #ddd',
-                  borderRadius: 4,
-                  fontSize: '0.875rem',
-                }}
-              />
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{
-                    padding: '0.625rem 1.25rem',
-                    backgroundColor: isSubmitting ? '#95a5a6' : (authMode === 'signin' ? '#3498db' : '#27ae60'),
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    flex: 1,
-                  }}
-                >
-                  {isSubmitting ? '⏳ Please wait...' : (authMode === 'signin' ? 'Sign In' : 'Create Account')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAuthForm(false)}
-                  style={{
-                    padding: '0.625rem 1rem',
-                    backgroundColor: '#95a5a6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: '#7f8c8d', textAlign: 'center' }}>
-                {authMode === 'signin' ? (
-                  <>
-                    Don't have an account?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('signup')}
-                      style={{ background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                    >
-                      Sign up
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('signin')}
-                      style={{ background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                    >
-                      Sign in
-                    </button>
-                  </>
-                )}
-              </p>
-            </form>
-          )}
+          <p style={{ margin: '0 0 1rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
+            Sign in to enable multi-device sync and cloud backups.
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Link
+              to="/signin"
+              style={{
+                padding: '0.625rem 1.25rem',
+                backgroundColor: '#3498db',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: 4,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                display: 'inline-block',
+              }}
+            >
+              🔐 Sign In
+            </Link>
+            <Link
+              to="/signup"
+              style={{
+                padding: '0.625rem 1.25rem',
+                backgroundColor: '#27ae60',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: 4,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                display: 'inline-block',
+              }}
+            >
+              ✨ Sign Up
+            </Link>
+          </div>
         </>
       ) : (
         <>

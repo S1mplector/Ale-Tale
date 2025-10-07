@@ -14,8 +14,11 @@ import { MyBeersPage } from '@presentation/pages/MyBeersPage';
 import { StatisticsPage } from '@presentation/pages/StatisticsPage';
 import { SearchPage } from '@presentation/pages/SearchPage';
 import { SettingsPage } from '@presentation/pages/SettingsPage';
+import { SignUpPage } from '@presentation/pages/SignUpPage';
+import { SignInPage } from '@presentation/pages/SignInPage';
 import { SplashScreen } from '@presentation/components/SplashScreen';
 import { SetupPage } from '@presentation/pages/SetupPage';
+import { RequireAuth } from '@presentation/components/RequireAuth';
 import { storageAdapter } from '@infrastructure/storage/StorageAdapter';
 import { supabaseService } from '@infrastructure/database/SupabaseService';
 import { syncService } from '@infrastructure/database/SyncService';
@@ -76,19 +79,24 @@ export function App() {
       {showSplash && <SplashScreen onDone={handleSplashDone} />}
       <Layout>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/bars" element={<BarsPage />} />
-          <Route path="/bars/add" element={<AddBarPage />} />
-          <Route path="/bars/:id" element={<BarDetailPage />} />
-          <Route path="/bars/:id/edit" element={<EditBarPage />} />
-          <Route path="/log" element={<LogPage />} />
-          <Route path="/add" element={<AddEntryPage />} />
-          <Route path="/entry/:id" element={<EntryDetailPage />} />
-          <Route path="/entry/:id/edit" element={<EditEntryPage />} />
-          <Route path="/my-beers" element={<MyBeersPage />} />
-          <Route path="/statistics" element={<StatisticsPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          {/* Public routes */}
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          
+          {/* Protected routes - require authentication */}
+          <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
+          <Route path="/bars" element={<RequireAuth><BarsPage /></RequireAuth>} />
+          <Route path="/bars/add" element={<RequireAuth><AddBarPage /></RequireAuth>} />
+          <Route path="/bars/:id" element={<RequireAuth><BarDetailPage /></RequireAuth>} />
+          <Route path="/bars/:id/edit" element={<RequireAuth><EditBarPage /></RequireAuth>} />
+          <Route path="/log" element={<RequireAuth><LogPage /></RequireAuth>} />
+          <Route path="/add" element={<RequireAuth><AddEntryPage /></RequireAuth>} />
+          <Route path="/entry/:id" element={<RequireAuth><EntryDetailPage /></RequireAuth>} />
+          <Route path="/entry/:id/edit" element={<RequireAuth><EditEntryPage /></RequireAuth>} />
+          <Route path="/my-beers" element={<RequireAuth><MyBeersPage /></RequireAuth>} />
+          <Route path="/statistics" element={<RequireAuth><StatisticsPage /></RequireAuth>} />
+          <Route path="/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
         </Routes>
       </Layout>
     </BrowserRouter>
