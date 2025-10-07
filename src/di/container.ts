@@ -1,6 +1,6 @@
 import { LocalStorageBeerRepository } from '@infrastructure/repositories/LocalStorageBeerRepository';
-import { LocalStorageJournalEntryRepository } from '@infrastructure/repositories/LocalStorageJournalEntryRepository';
-import { LocalStorageBarRepository } from '@infrastructure/repositories/LocalStorageBarRepository';
+import { FileSystemJournalEntryRepository } from '@infrastructure/repositories/FileSystemJournalEntryRepository';
+import { FileSystemBarRepository } from '@infrastructure/repositories/FileSystemBarRepository';
 import { ListBeersUseCase } from '@application/usecases/ListBeersUseCase';
 import { CreateJournalEntryUseCase } from '@application/usecases/CreateJournalEntryUseCase';
 import { ListJournalEntriesUseCase } from '@application/usecases/ListJournalEntriesUseCase';
@@ -13,10 +13,10 @@ import { GetBarUseCase } from '@application/usecases/GetBarUseCase';
 import { DeleteBarUseCase } from '@application/usecases/DeleteBarUseCase';
 import { UpdateBarUseCase } from '@application/usecases/UpdateBarUseCase';
 
-// Repositories
+// Repositories - using file system for persistence
 const beerRepository = new LocalStorageBeerRepository();
-const journalEntryRepository = new LocalStorageJournalEntryRepository();
-const barRepository = new LocalStorageBarRepository();
+const journalEntryRepository = new FileSystemJournalEntryRepository();
+const barRepository = new FileSystemBarRepository();
 
 // Use Cases
 export const listBeersUseCase = new ListBeersUseCase(beerRepository);

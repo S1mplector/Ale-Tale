@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { listJournalEntriesUseCase, listBarsUseCase } from '@di/container';
+import { storageAdapter } from '@infrastructure/storage/StorageAdapter';
 
 export function SettingsPage() {
   const [stats, setStats] = useState({ entries: 0, bars: 0 });
   const [showConfirm, setShowConfirm] = useState(false);
   const [showImportSuccess, setShowImportSuccess] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
+  const [directoryName, setDirectoryName] = useState<string | null>(null);
+  const [isChangingDirectory, setIsChangingDirectory] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -17,6 +20,39 @@ export function SettingsPage() {
       listBarsUseCase.execute(),
     ]);
     setStats({ entries: entries.length, bars: bars.length });
+    setDirectoryName(storageAdapter.getDirectoryName());
+  };
+
+  const handleChangeDirectory = async () => {
+    if (!storageAdapter.isFileSystemSupported()) {
+      alert('File System Access API is not supported in your browser. Using localStorage instead.');
+      return;
+    }
+
+    const confirmChange = storageAdapter.isUsingFileSystem()
+      ? 'Are you sure you want to change the data directory? Your current data will remain in the old location.'
+      : 'Switch to file-based storage? Your current localStorage data will be migrated to the selected directory.';
+
+    if (!window.confirm(confirmChange)) {
+      return;
+    }
+
+    setIsChangingDirectory(true);
+    try {
+      const success = await storageAdapter.changeToFileSystem();
+      if (success) {
+        setDirectoryName(storageAdapter.getDirectoryName());
+        alert('Directory setup successful! The page will reload to apply changes.');
+        window.location.reload();
+      } else {
+        alert('Directory selection was cancelled.');
+      }
+    } catch (error) {
+      console.error('Error changing directory:', error);
+      alert('Failed to change directory. Please try again.');
+    } finally {
+      setIsChangingDirectory(false);
+    }
   };
 
   const handleExportData = () => {
@@ -135,6 +171,61 @@ export function SettingsPage() {
         </div>
 
         <div style={{ display: 'grid', gap: '1.5rem' }}>
+          {/* Directory Management */}
+          <div style={{ padding: '1.5rem', backgroundColor: '#e8f4f8', borderRadius: 6, border: '1px solid #3498db' }}>
+            <h4 style={{ margin: '0 0 0.5rem 0', color: '#2c3e50', fontSize: '1rem' }}>📁 Data Directory</h4>
+            <p style={{ margin: '0 0 1rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
+              All your journal data is stored in this directory
+            </p>
+            <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: 4, marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.75rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>
+                {storageAdapter.isUsingFileSystem() ? 'Current Directory' : 'Storage Type'}
+              </div>
+              <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#2c3e50', fontFamily: 'monospace' }}>
+                {storageAdapter.isUsingFileSystem() 
+                  ? (directoryName || 'Not set')
+                  : 'Browser LocalStorage'}
+              </div>
+            </div>
+            {storageAdapter.isFileSystemSupported() && (
+              <>
+                <button
+                  onClick={handleChangeDirectory}
+                  disabled={isChangingDirectory}
+                  style={{
+                    padding: '0.625rem 1.25rem',
+                    backgroundColor: isChangingDirectory ? '#95a5a6' : '#3498db',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 4,
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: isChangingDirectory ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isChangingDirectory 
+                    ? '⏳ Changing...' 
+                    : storageAdapter.isUsingFileSystem() 
+                      ? '🔄 Change Directory' 
+                      : '📁 Switch to File System Storage'}
+                </button>
+                <p style={{ margin: '0.75rem 0 0 0', color: '#7f8c8d', fontSize: '0.75rem' }}>
+                  {storageAdapter.isUsingFileSystem()
+                    ? '💡 Choose a new directory to store your data. Data will be migrated automatically.'
+                    : '💡 Switch to file-based storage for better data control and portability.'}
+                </p>
+              </>
+            )}
+            {!storageAdapter.isFileSystemSupported() && (
+              <div style={{ padding: '1rem', backgroundColor: '#fff3cd', borderRadius: 4, border: '1px solid #ffc107' }}>
+                <p style={{ margin: 0, color: '#856404', fontSize: '0.875rem' }}>
+                  ⚠️ Your browser doesn't support File System Access API. Using localStorage instead.
+                  For file-based storage, please use Chrome, Edge, or Opera.
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Data Management */}
           <div style={{ padding: '1.5rem', backgroundColor: '#f8f9fa', borderRadius: 6 }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#2c3e50', fontSize: '1rem' }}>💾 Data Management</h4>
@@ -207,7 +298,7 @@ export function SettingsPage() {
           <div style={{ padding: '1.5rem', backgroundColor: '#f8f9fa', borderRadius: 6 }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#2c3e50', fontSize: '1rem' }}>💿 Storage Information</h4>
             <p style={{ margin: '0 0 1rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
-              Your data is stored locally in your browser
+              Your data is stored as JSON files on your computer
             </p>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
               <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: 4, display: 'flex', justifyContent: 'space-between' }}>
@@ -220,8 +311,20 @@ export function SettingsPage() {
               </div>
               <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: 4 }}>
                 <div style={{ fontSize: '0.75rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>Storage Type</div>
-                <div style={{ fontSize: '0.875rem', color: '#2c3e50' }}>Browser LocalStorage</div>
+                <div style={{ fontSize: '0.875rem', color: '#2c3e50' }}>
+                  {storageAdapter.isUsingFileSystem() ? 'File System (JSON)' : 'Browser LocalStorage'}
+                </div>
               </div>
+              {storageAdapter.isUsingFileSystem() && (
+                <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: 4 }}>
+                  <div style={{ fontSize: '0.75rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>Data Files</div>
+                  <div style={{ fontSize: '0.8125rem', color: '#2c3e50', fontFamily: 'monospace' }}>
+                    journal_entries.json<br />
+                    bars.json<br />
+                    settings.json
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -242,10 +345,10 @@ export function SettingsPage() {
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#856404', fontSize: '1rem' }}>🚀 Coming Soon</h4>
             <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.5rem', color: '#856404', fontSize: '0.875rem', lineHeight: 1.6 }}>
               <li>Dark mode theme</li>
-              <li>Cloud sync across devices</li>
-              <li>Share entries with friends</li>
+              <li>Automatic backups</li>
+              <li>Export to PDF reports</li>
               <li>Advanced filtering and charts</li>
-              <li>Mobile app for iOS and Android</li>
+              <li>Tasting note templates</li>
             </ul>
           </div>
         </div>

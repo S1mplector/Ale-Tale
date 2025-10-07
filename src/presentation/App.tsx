@@ -15,13 +15,48 @@ import { StatisticsPage } from '@presentation/pages/StatisticsPage';
 import { SearchPage } from '@presentation/pages/SearchPage';
 import { SettingsPage } from '@presentation/pages/SettingsPage';
 import { SplashScreen } from '@presentation/components/SplashScreen';
+import { SetupPage } from '@presentation/pages/SetupPage';
+import { storageAdapter } from '@infrastructure/storage/StorageAdapter';
 
 export function App() {
   const [showSplash, setShowSplash] = React.useState(true);
+  const [isReady, setIsReady] = React.useState(false);
+  const [needsSetup, setNeedsSetup] = React.useState(false);
+
+  // Initialize storage adapter
+  React.useEffect(() => {
+    const init = async () => {
+      try {
+        const result = await storageAdapter.initialize();
+        setNeedsSetup(result.setupRequired);
+      } catch (error) {
+        console.error('Error initializing storage:', error);
+        setNeedsSetup(true);
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    init();
+  }, []);
 
   const handleSplashDone = React.useCallback(() => {
     setShowSplash(false);
   }, []);
+
+  const handleSetupComplete = React.useCallback(() => {
+    setNeedsSetup(false);
+  }, []);
+
+  // Show nothing while initializing
+  if (!isReady) {
+    return null;
+  }
+
+  // Show setup page if directory not configured
+  if (needsSetup) {
+    return <SetupPage onComplete={handleSetupComplete} />;
+  }
 
   return (
     <BrowserRouter>
