@@ -9,9 +9,12 @@ export function SettingsPage() {
   const [showExportSuccess, setShowExportSuccess] = useState(false);
   const [directoryName, setDirectoryName] = useState<string | null>(null);
   const [isChangingDirectory, setIsChangingDirectory] = useState(false);
+  const [usageBytes, setUsageBytes] = useState<number | null>(null);
+  const [quotaBytes, setQuotaBytes] = useState<number | null>(null);
 
   useEffect(() => {
     loadStats();
+    loadEstimate();
   }, []);
 
   const loadStats = async () => {
@@ -21,6 +24,17 @@ export function SettingsPage() {
     ]);
     setStats({ entries: entries.length, bars: bars.length });
     setDirectoryName(storageAdapter.getDirectoryName());
+  };
+
+  const loadEstimate = async () => {
+    try {
+      const est = await storageAdapter.getStorageEstimate();
+      setUsageBytes(est.usage ?? null);
+      setQuotaBytes(est.quota ?? null);
+    } catch (e) {
+      setUsageBytes(null);
+      setQuotaBytes(null);
+    }
   };
 
   const handleChangeDirectory = async () => {
@@ -55,20 +69,10 @@ export function SettingsPage() {
     }
   };
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     try {
-      // Get all data from localStorage
-      const journalEntries = localStorage.getItem('journal-entries') || '[]';
-      const bars = localStorage.getItem('bars') || '[]';
-      
-      const exportData = {
-        version: '1.0',
-        exportDate: new Date().toISOString(),
-        data: {
-          journalEntries: JSON.parse(journalEntries),
-          bars: JSON.parse(bars),
-        },
-      };
+      // Get all data from current storage backend
+      const exportData = await storageAdapter.exportAllData();
 
       // Create blob and download
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -83,6 +87,7 @@ export function SettingsPage() {
 
       setShowExportSuccess(true);
       setTimeout(() => setShowExportSuccess(false), 3000);
+      await loadEstimate();
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export data. Please try again.');
@@ -105,19 +110,15 @@ export function SettingsPage() {
           throw new Error('Invalid backup file format');
         }
 
-        // Restore data to localStorage
-        if (importData.data.journalEntries) {
-          localStorage.setItem('journal-entries', JSON.stringify(importData.data.journalEntries));
-        }
-        if (importData.data.bars) {
-          localStorage.setItem('bars', JSON.stringify(importData.data.bars));
-        }
+        // Import data using storage adapter
+        await storageAdapter.importAllData(importData);
 
         setShowImportSuccess(true);
         setTimeout(() => {
           setShowImportSuccess(false);
           window.location.reload();
         }, 2000);
+        await loadEstimate();
       } catch (error) {
         console.error('Import failed:', error);
         alert('Failed to import data. Please check the file format and try again.');
@@ -126,12 +127,18 @@ export function SettingsPage() {
     input.click();
   };
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
     if (showConfirm) {
-      localStorage.removeItem('journal-entries');
-      localStorage.removeItem('bars');
-      setShowConfirm(false);
-      window.location.reload();
+      try {
+        await storageAdapter.delete('journal_entries');
+        await storageAdapter.delete('bars');
+        setShowConfirm(false);
+        window.location.reload();
+        await loadEstimate();
+      } catch (error) {
+        console.error('Clear data failed:', error);
+        alert('Failed to clear data. Please try again.');
+      }
     } else {
       setShowConfirm(true);
       setTimeout(() => setShowConfirm(false), 5000);
@@ -175,7 +182,7 @@ export function SettingsPage() {
           <div style={{ padding: '1.5rem', backgroundColor: '#e8f4f8', borderRadius: 6, border: '1px solid #3498db' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#2c3e50', fontSize: '1rem' }}>📁 Data Directory</h4>
             <p style={{ margin: '0 0 1rem 0', color: '#7f8c8d', fontSize: '0.875rem' }}>
-              All your journal data is stored in this directory
+              All your journal data is stored in this directory. If your browser supports it, you can switch to file-based storage.
             </p>
             <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: 4, marginBottom: '1rem' }}>
               <div style={{ fontSize: '0.75rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>
@@ -184,46 +191,36 @@ export function SettingsPage() {
               <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#2c3e50', fontFamily: 'monospace' }}>
                 {storageAdapter.isUsingFileSystem() 
                   ? (directoryName || 'Not set')
-                  : 'Browser LocalStorage'}
+                  : storageAdapter.getStorageTypeName()}
               </div>
             </div>
-            {storageAdapter.isFileSystemSupported() && (
-              <>
-                <button
-                  onClick={handleChangeDirectory}
-                  disabled={isChangingDirectory}
-                  style={{
-                    padding: '0.625rem 1.25rem',
-                    backgroundColor: isChangingDirectory ? '#95a5a6' : '#3498db',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: isChangingDirectory ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {isChangingDirectory 
-                    ? '⏳ Changing...' 
-                    : storageAdapter.isUsingFileSystem() 
-                      ? '🔄 Change Directory' 
-                      : '📁 Switch to File System Storage'}
-                </button>
-                <p style={{ margin: '0.75rem 0 0 0', color: '#7f8c8d', fontSize: '0.75rem' }}>
-                  {storageAdapter.isUsingFileSystem()
+            <button
+              onClick={handleChangeDirectory}
+              disabled={isChangingDirectory}
+              style={{
+                padding: '0.625rem 1.25rem',
+                backgroundColor: isChangingDirectory ? '#95a5a6' : '#3498db',
+                color: 'white',
+                border: 'none',
+                borderRadius: 4,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor: isChangingDirectory ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {isChangingDirectory
+                ? '⏳ Working...'
+                : storageAdapter.isFileSystemSupported()
+                  ? (storageAdapter.isUsingFileSystem() ? '🔄 Change Directory' : '📁 Enable File-Based Storage')
+                  : 'ℹ️ Learn How to Enable File Storage'}
+            </button>
+            <p style={{ margin: '0.75rem 0 0 0', color: '#7f8c8d', fontSize: '0.75rem' }}>
+              {storageAdapter.isFileSystemSupported()
+                ? (storageAdapter.isUsingFileSystem()
                     ? '💡 Choose a new directory to store your data. Data will be migrated automatically.'
-                    : '💡 Switch to file-based storage for better data control and portability.'}
-                </p>
-              </>
-            )}
-            {!storageAdapter.isFileSystemSupported() && (
-              <div style={{ padding: '1rem', backgroundColor: '#fff3cd', borderRadius: 4, border: '1px solid #ffc107' }}>
-                <p style={{ margin: 0, color: '#856404', fontSize: '0.875rem' }}>
-                  ⚠️ Your browser doesn't support File System Access API. Using localStorage instead.
-                  For file-based storage, please use Chrome, Edge, or Opera.
-                </p>
-              </div>
-            )}
+                    : '💡 Switch to file-based storage for better data control and portability.')
+                : '💡 File-based storage requires a Chromium-based browser (Chrome, Edge, Opera) in a secure context (https or localhost).'}
+            </p>
           </div>
 
           {/* Data Management */}
@@ -239,6 +236,45 @@ export function SettingsPage() {
                 </div>
                 <div style={{ fontSize: '0.8125rem', color: '#7f8c8d' }}>
                   Total Items ({stats.entries} beers, {stats.bars} bars)
+                </div>
+              </div>
+              <div style={{ flex: 2, minWidth: 260 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.8125rem', color: '#2c3e50' }}>Storage Usage</span>
+                  <span style={{ fontSize: '0.8125rem', color: '#7f8c8d' }}>
+                    {usageBytes !== null && quotaBytes !== null
+                      ? `${(usageBytes / (1024*1024)).toFixed(2)} MB / ${(quotaBytes / (1024*1024)).toFixed(0)} MB`
+                      : 'Estimating...'}
+                  </span>
+                </div>
+                <div style={{ height: 8, backgroundColor: '#ecf0f1', borderRadius: 999, overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      width: usageBytes !== null && quotaBytes ? `${Math.min(100, Math.max(0, (usageBytes / quotaBytes) * 100)).toFixed(1)}%` : '0%',
+                      background: 'linear-gradient(90deg, #27ae60, #2ecc71)',
+                      transition: 'width 200ms ease-out'
+                    }}
+                  />
+                </div>
+                <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#7f8c8d' }}>
+                    {storageAdapter.getStorageTypeName()} {quotaBytes ? '(quota estimate)' : ''}
+                  </div>
+                  <button
+                    onClick={loadEstimate}
+                    style={{
+                      padding: '0.375rem 0.75rem',
+                      backgroundColor: '#95a5a6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 4,
+                      fontSize: '0.75rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ↻ Refresh Usage
+                  </button>
                 </div>
               </div>
             </div>
@@ -312,7 +348,7 @@ export function SettingsPage() {
               <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: 4 }}>
                 <div style={{ fontSize: '0.75rem', color: '#7f8c8d', marginBottom: '0.25rem' }}>Storage Type</div>
                 <div style={{ fontSize: '0.875rem', color: '#2c3e50' }}>
-                  {storageAdapter.isUsingFileSystem() ? 'File System (JSON)' : 'Browser LocalStorage'}
+                  {storageAdapter.getStorageTypeName()}
                 </div>
               </div>
               {storageAdapter.isUsingFileSystem() && (
