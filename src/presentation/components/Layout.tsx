@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BeerGlass } from './BeerGlass';
+import { MAX_WIDTH, SUBNAV_MAX_WIDTH, NAV_HORIZONTAL_PADDING, PAGE_PADDING } from '@presentation/constants/layout';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,13 +18,13 @@ export function Layout({ children }: LayoutProps) {
         style={{
           backgroundColor: '#2c3e50',
           color: 'white',
-          padding: '0.75rem 2rem',
+          padding: `0.75rem ${NAV_HORIZONTAL_PADDING}`,
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}
       >
         <div
           style={{
-            maxWidth: 1400,
+            maxWidth: MAX_WIDTH,
             margin: '0 auto',
             display: 'flex',
             justifyContent: 'space-between',
@@ -154,7 +155,7 @@ export function Layout({ children }: LayoutProps) {
       </nav>
       {/* Sub-navigation */}
       <div style={{ background: '#34495e' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 2rem' }}>
+        <div style={{ maxWidth: SUBNAV_MAX_WIDTH, margin: '0 auto', padding: `0 ${NAV_HORIZONTAL_PADDING}` }}>
           <div style={{ display: 'flex', gap: 8 }}>
             <Link to="/" style={{
               color: activeColor('/'),
@@ -177,7 +178,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </div>
-      <main style={{ maxWidth: 1400, margin: '0 auto', padding: '2rem' }}>{children}</main>
+      <main style={{ maxWidth: MAX_WIDTH, margin: '0 auto', padding: PAGE_PADDING }}>{children}</main>
     </div>
   );
 }
