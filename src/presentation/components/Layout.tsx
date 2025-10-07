@@ -106,7 +106,12 @@ export function Layout({ children }: LayoutProps) {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⊞</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ opacity: 0.9 }}>
+                <rect x="1" y="1" width="5.5" height="5.5" rx="1" />
+                <rect x="9" y="1" width="5.5" height="5.5" rx="1" />
+                <rect x="1" y="9" width="5.5" height="5.5" rx="1" />
+                <rect x="9" y="9" width="5.5" height="5.5" rx="1" />
+              </svg>
               Beer Database
             </Link>
             <Link
@@ -127,7 +132,11 @@ export function Layout({ children }: LayoutProps) {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              <span style={{ fontSize: '1rem', opacity: 0.9 }}>▤</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.9 }}>
+                <rect x="2" y="10" width="3" height="4" rx="0.5" />
+                <rect x="6.5" y="6" width="3" height="8" rx="0.5" />
+                <rect x="11" y="2" width="3" height="12" rx="0.5" />
+              </svg>
               Statistics
             </Link>
             <Link
@@ -148,7 +157,10 @@ export function Layout({ children }: LayoutProps) {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⌕</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ opacity: 0.9 }}>
+                <circle cx="6.5" cy="6.5" r="4.5" />
+                <line x1="10" y1="10" x2="14" y2="14" />
+              </svg>
               Search
             </Link>
             <Link
@@ -169,7 +181,10 @@ export function Layout({ children }: LayoutProps) {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⚙</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.9 }}>
+                <circle cx="8" cy="8" r="2.5" />
+                <path d="M8 1 L8 3 M8 13 L8 15 M1 8 L3 8 M13 8 L15 8 M3.5 3.5 L4.9 4.9 M11.1 11.1 L12.5 12.5 M3.5 12.5 L4.9 11.1 M11.1 4.9 L12.5 3.5" />
+              </svg>
               Settings
             </Link>
           </div>
