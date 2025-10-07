@@ -17,20 +17,43 @@ import { SettingsPage } from '@presentation/pages/SettingsPage';
 import { SplashScreen } from '@presentation/components/SplashScreen';
 import { SetupPage } from '@presentation/pages/SetupPage';
 import { storageAdapter } from '@infrastructure/storage/StorageAdapter';
+import { supabaseService } from '@infrastructure/database/SupabaseService';
+import { syncService } from '@infrastructure/database/SyncService';
 
 export function App() {
   const [showSplash, setShowSplash] = React.useState(true);
   const [isReady, setIsReady] = React.useState(false);
 
-  // Initialize storage adapter
+  // Initialize storage adapter and cloud services
   React.useEffect(() => {
     const init = async () => {
       try {
+        // Initialize local storage
         await storageAdapter.initialize();
-        // Note: We no longer require setup - IndexedDB works out of the box
-        // File system is optional and can be enabled from Settings
+
+        // Initialize Supabase if configured
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        const disableSync = import.meta.env.VITE_DISABLE_CLOUD_SYNC === 'true';
+
+        if (supabaseUrl && supabaseKey && !disableSync) {
+          try {
+            supabaseService.initialize({ url: supabaseUrl, anonKey: supabaseKey });
+            await syncService.initialize();
+            
+            // Start auto-sync if user is authenticated
+            if (supabaseService.isAuthenticated()) {
+              syncService.startAutoSync();
+              console.log('✅ Cloud sync enabled');
+            }
+          } catch (error) {
+            console.log('⚠️ Cloud sync not available:', error);
+          }
+        } else {
+          console.log('ℹ️ Cloud sync not configured (local-only mode)');
+        }
       } catch (error) {
-        console.error('Error initializing storage:', error);
+        console.error('Error initializing app:', error);
       } finally {
         setIsReady(true);
       }

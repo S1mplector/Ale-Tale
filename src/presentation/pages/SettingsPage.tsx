@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { listJournalEntriesUseCase, listBarsUseCase } from '@di/container';
 import { storageAdapter } from '@infrastructure/storage/StorageAdapter';
+import { CloudSyncSettings } from '@presentation/components/CloudSyncSettings';
 
 export function SettingsPage() {
   const [stats, setStats] = useState({ entries: 0, bars: 0 });
@@ -222,6 +223,9 @@ export function SettingsPage() {
                 : '💡 File-based storage requires a Chromium-based browser (Chrome, Edge, Opera) in a secure context (https or localhost).'}
             </p>
           </div>
+
+          {/* Cloud Sync */}
+          <CloudSyncSettings />
 
           {/* Data Management */}
           <div style={{ padding: '1.5rem', backgroundColor: '#f8f9fa', borderRadius: 6 }}>
