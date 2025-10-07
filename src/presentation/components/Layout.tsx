@@ -27,7 +27,6 @@ export function Layout({ children }: LayoutProps) {
             maxWidth: MAX_WIDTH,
             margin: '0 auto',
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
             gap: '2rem',
           }}
@@ -50,8 +49,8 @@ export function Layout({ children }: LayoutProps) {
             <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Ale Tale</h1>
           </Link>
 
-          {/* Center Navigation */}
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+          {/* Main Navigation */}
+          <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
             <Link
               to="/my-beers"
               style={{
@@ -61,16 +60,17 @@ export function Layout({ children }: LayoutProps) {
                 borderRadius: 4,
                 fontSize: '0.9375rem',
                 fontWeight: 500,
+                backgroundColor: location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                backgroundColor: location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/my-beers' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              🍺 My Beers
+              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⊞</span>
+              Beer Database
             </Link>
             <Link
               to="/statistics"
@@ -81,16 +81,17 @@ export function Layout({ children }: LayoutProps) {
                 borderRadius: 4,
                 fontSize: '0.9375rem',
                 fontWeight: 500,
+                backgroundColor: location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                backgroundColor: location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/statistics' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              📊 Statistics
+              <span style={{ fontSize: '1rem', opacity: 0.9 }}>▤</span>
+              Statistics
             </Link>
             <Link
               to="/search"
@@ -101,18 +102,43 @@ export function Layout({ children }: LayoutProps) {
                 borderRadius: 4,
                 fontSize: '0.9375rem',
                 fontWeight: 500,
+                backgroundColor: location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                backgroundColor: location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/search' ? 'rgba(255,255,255,0.1)' : 'transparent'}
             >
-              🔍 Search
+              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⌕</span>
+              Search
+            </Link>
+            <Link
+              to="/settings"
+              style={{
+                color: '#ecf0f1',
+                textDecoration: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: 4,
+                fontSize: '0.9375rem',
+                fontWeight: 500,
+                backgroundColor: location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                transition: 'background-color 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent'}
+            >
+              <span style={{ fontSize: '1rem', opacity: 0.9 }}>⚙</span>
+              Settings
             </Link>
           </div>
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
 
           {/* Right Actions */}
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0 }}>
@@ -130,25 +156,6 @@ export function Layout({ children }: LayoutProps) {
               }}
             >
               + New Entry
-            </Link>
-            <Link
-              to="/settings"
-              style={{
-                color: '#ecf0f1',
-                textDecoration: 'none',
-                padding: '0.5rem',
-                borderRadius: 4,
-                fontSize: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                transition: 'background-color 0.2s',
-              }}
-              title="Settings"
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = location.pathname === '/settings' ? 'rgba(255,255,255,0.1)' : 'transparent'}
-            >
-              ⚙️
             </Link>
           </div>
         </div>
