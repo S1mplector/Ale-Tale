@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getJournalEntryUseCase, deleteJournalEntryUseCase } from '@di/container';
 import type { JournalEntry } from '@domain/entities/JournalEntry';
+import { renderStars, formatDateLong } from '@presentation/utils/ui';
 
 export function EntryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,29 +22,6 @@ export function EntryDetailPage() {
     if (!id || !confirm('Delete this entry?')) return;
     await deleteJournalEntryUseCase.execute(id);
     navigate('/');
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push('★');
-      } else if (rating >= i - 0.5) {
-        stars.push('½');
-      } else {
-        stars.push('☆');
-      }
-    }
-    return stars.join('');
   };
 
   if (loading) {
@@ -73,7 +51,7 @@ export function EntryDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ maxWidth: 1400, margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <Link
           to="/"
@@ -155,7 +133,7 @@ export function EntryDetailPage() {
               When & Where
             </h3>
             <p style={{ margin: 0, color: '#34495e', fontSize: '1rem', lineHeight: 1.8 }}>
-              📅 {formatDate(entry.drankAt)}
+              📅 {formatDateLong(entry.drankAt)}
               {entry.location && <><br />📍 {entry.location}</>}
               {entry.pairingFood && <><br />🍴 Paired with: {entry.pairingFood}</>}
             </p>
@@ -246,7 +224,7 @@ export function EntryDetailPage() {
             marginBottom: '2rem',
           }}
         >
-          Entry created on {formatDate(entry.createdAt)}
+          Entry created on {formatDateLong(entry.createdAt)}
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>

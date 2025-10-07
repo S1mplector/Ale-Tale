@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBarUseCase, deleteBarUseCase } from '@di/container';
 import type { Bar } from '@domain/entities/Bar';
+import { renderStars, formatDateLong } from '@presentation/utils/ui';
 
 export function BarDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,29 +22,6 @@ export function BarDetailPage() {
     if (!id || !confirm('Delete this bar?')) return;
     await deleteBarUseCase.execute(id);
     navigate('/bars');
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push('★');
-      } else if (rating >= i - 0.5) {
-        stars.push('½');
-      } else {
-        stars.push('☆');
-      }
-    }
-    return stars.join('');
   };
 
   if (loading) {
@@ -73,7 +51,7 @@ export function BarDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ maxWidth: 1400, margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <Link
           to="/bars"
@@ -137,7 +115,7 @@ export function BarDetailPage() {
               Visited Date
             </h3>
             <p style={{ margin: 0, color: '#34495e', fontSize: '1rem' }}>
-              📅 {formatDate(bar.visitedAt)}
+              📅 {formatDateLong(bar.visitedAt)}
             </p>
           </div>
         </div>
@@ -251,7 +229,7 @@ export function BarDetailPage() {
             marginBottom: '2rem',
           }}
         >
-          Entry created on {formatDate(bar.createdAt)}
+          Entry created on {formatDateLong(bar.createdAt)}
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>

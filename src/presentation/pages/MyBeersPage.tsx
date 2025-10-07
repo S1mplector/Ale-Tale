@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listJournalEntriesUseCase } from '@di/container';
 import type { JournalEntry } from '@domain/entities/JournalEntry';
+import { renderStars } from '@presentation/utils/ui';
 
 interface BeerSummary {
   beerId: string;
@@ -62,19 +63,7 @@ export function MyBeersPage() {
     }
   };
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push('★');
-      } else if (rating >= i - 0.5) {
-        stars.push('½');
-      } else {
-        stars.push('☆');
-      }
-    }
-    return stars.join('');
-  };
+  
 
   const sortedAndFilteredBeers = beers
     .filter((beer) => {
